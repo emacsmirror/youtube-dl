@@ -40,7 +40,7 @@
   :group 'youtube-dl
   :type 'directory)
 
-(defcustom youtube-dl-program "youtube-dl"
+(defcustom youtube-dl-program "yt-dlp"
   "The name of the program invoked for downloading YouTube videos."
   :group 'youtube-dl
   :type 'string)
@@ -231,7 +231,8 @@ display purposes anyway."
   "Return the 11-character video ID for URL."
   (save-match-data
     (when (string-match
-           "\\(?:\\.be/\\|v=\\|v%3D\\|^\\)\\([-_a-zA-Z0-9]\\{11\\}\\)" url)
+           "\\(?:\\.be/\\|v=\\|v%3D\\|shorts/\\|^\\)\\([-_a-zA-Z0-9]\\{11\\}\\)"
+           url)
       (match-string 1 url))))
 
 ;;;###autoload
@@ -266,7 +267,7 @@ display purposes anyway."
                                "--dump-json"
                                "--flat-playlist"
                                playlist))
-      (setf (point) (point-min))
+      (goto-char (point-min))
       (cl-loop with json-object-type = 'plist
                for index upfrom 1
                for video = (ignore-errors (json-read))
@@ -345,7 +346,7 @@ of reversed playlists.
     (let ((save-point (point))
           (window (get-buffer-window (current-buffer))))
       (youtube-dl--fill-listing)
-      (setf (point) save-point)
+      (goto-char save-point)
       (when window
         (set-window-point window save-point))
       (when hl-line-mode
